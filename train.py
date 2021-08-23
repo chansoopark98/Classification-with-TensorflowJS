@@ -83,8 +83,9 @@ if USE_WEIGHT_DECAY:
 
 model.compile(
     optimizer=optimizer,
+    metrics='accuracy',
     # loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True))
-    loss=loss.sparse_categorical_loss)
+    loss=loss.sparse_categorical_loss,)
 
 model.summary()
 
