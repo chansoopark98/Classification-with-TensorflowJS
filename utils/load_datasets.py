@@ -36,6 +36,7 @@ class GenerateDatasets:
     def _load_train_datasets(self):
         train_pascal_12 = tfds.load('voc/2012', data_dir=self.data_dir, split='train')
         train_pascal_07 = tfds.load("voc", data_dir=self.data_dir, split='train')
+        train_pascal_07 = train_pascal_07.filter(lambda x: tf.reduce_all(tf.equal(tf.size(x['labels']), 1)))
 
         # train_data = train_pascal_07.concatenate(train_pascal_12)
         train_data = train_pascal_07
@@ -76,7 +77,7 @@ class GenerateDatasets:
     def preprocess(self, sample):
         img = tf.cast(sample['image'], dtype=tf.float32)
         label = tf.cast(sample['labels'], dtype=tf.int64)
-
+        tf.print(label, sys.stdout)
 
         img = preprocess_input(img, mode='torch')
         return (img, label[0])
