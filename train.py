@@ -7,11 +7,11 @@ from utils.load_datasets import GenerateDatasets
 from utils.callbacks import Scalar_LR
 from model.model_builder import model_builder
 from model.loss import Loss
-
+import os
 parser = argparse.ArgumentParser()
 parser.add_argument("--batch_size",     type=int,   help="배치 사이즈값 설정", default=1)
-parser.add_argument("--epoch",          type=int,   help="에폭 설정", default=120)
-parser.add_argument("--lr",             type=float, help="Learning rate 설정", default=0.001)
+parser.add_argument("--epoch",          type=int,   help="에폭 설정", default=100)
+parser.add_argument("--lr",             type=float, help="Learning rate 설정", default=0.01)
 parser.add_argument("--weight_decay",   type=float, help="Weight Decay 설정", default=0.0001)
 parser.add_argument("--image_size",   type=int, help="입력 이미지 크기 설정", default=224)
 parser.add_argument("--model_name",     type=str,   help="저장될 모델 이름",
@@ -40,6 +40,9 @@ LOAD_WEIGHT = args.load_weight
 MIXED_PRECISION = args.mixed_precision
 DISTRIBUTION_MODE = args.distribution_mode
 
+os.makedirs(DATASET_DIR, exist_ok=True)
+os.makedirs(CHECKPOINT_DIR, exist_ok=True)
+
 train_dataset_config = GenerateDatasets(mode='train', data_dir=DATASET_DIR, image_size=IMAGE_SIZE, batch_size=BATCH_SIZE)
 valid_dataset_config = GenerateDatasets(mode='valid', data_dir=DATASET_DIR, image_size=IMAGE_SIZE, batch_size=BATCH_SIZE)
 
@@ -59,7 +62,7 @@ tensorboard = tf.keras.callbacks.TensorBoard(log_dir=TENSORBOARD_DIR, write_grap
 
 polyDecay = tf.keras.optimizers.schedules.PolynomialDecay(initial_learning_rate=base_lr,
                                                           decay_steps=EPOCHS,
-                                                          end_learning_rate=0.00005, power=0.9)
+                                                          end_learning_rate=base_lr*0.05, power=0.9)
 
 lr_scheduler = tf.keras.callbacks.LearningRateScheduler(polyDecay, verbose=1)
 
@@ -84,7 +87,7 @@ if USE_WEIGHT_DECAY:
 model.compile(
     optimizer=optimizer,
     metrics='accuracy',
-    # loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True))
+    # loss='categorical_crossentropy')
     loss=loss.sparse_categorical_loss,)
 
 model.summary()
