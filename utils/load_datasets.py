@@ -38,7 +38,7 @@ class GenerateDatasets:
         train_pascal_07 = tfds.load("voc", data_dir=self.data_dir, split='train')
         # train_pascal_07 = train_pascal_07.filter(lambda x: tf.reduce_all(tf.equal(tf.size(x['labels']), 1)))
 
-        # train_data = train_pascal_07.concatenate(train_pascal_12)
+        train_data = train_pascal_07.concatenate(train_pascal_12)
         train_data = train_pascal_07
 
         number_train = train_data.reduce(0, lambda x, _: x + 1).numpy()
@@ -87,7 +87,7 @@ class GenerateDatasets:
     def get_trainData(self, train_data):
         train_data = train_data.map(self.preprocess, num_parallel_calls=AUTO)
         train_data = train_data.map(self.augmentation, num_parallel_calls=AUTO)
-        # train_data = train_data.shuffle(buffer_size=1000)
+        train_data = train_data.shuffle(buffer_size=1000)
         train_data = train_data.prefetch(AUTO)
         train_data = train_data.repeat()
         train_data = train_data.padded_batch(self.batch_size)
