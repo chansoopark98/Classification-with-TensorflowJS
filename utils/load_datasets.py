@@ -82,6 +82,7 @@ class GenerateDatasets:
         # tf.print(label, output_stream=sys.stdout, summarize=-1)
 
         img = preprocess_input(img, mode='torch')
+        img = tf.image.resize(img, (224, 224))
         return (img, label)
 
     def get_trainData(self, train_data):
